@@ -1,10 +1,7 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 import serial
-import time
 from ui.tab_manager import setup_tabs
-from ui.connection_tab import ConnectionTab
-from ui.base_tab import BaseTab
 import serial.tools.list_ports
 
 class PrinterControlApp:
