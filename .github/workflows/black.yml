@@ -7,8 +7,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: psf/black@stable
+
+      # Run Black to check and format files
+      - name: Run Black
+        run: |
+          black .
+        continue-on-error: true
+
+      # Check for changes and commit them
       - name: Commit re-formatted files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "Fixes coding style"
+          file_pattern: .
