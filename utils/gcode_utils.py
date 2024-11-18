@@ -5,6 +5,7 @@ This module provides utility functions to send G-code commands to a connected
 3D printer via a serial connection and to parse responses received from the printer.
 """
 
+
 def send_gcode(serial_connection, gcode, callback=None):
     """
     Send a G-code command to the 3D printer via the serial connection.
@@ -16,8 +17,8 @@ def send_gcode(serial_connection, gcode, callback=None):
     Args:
         serial_connection (serial.Serial): The serial connection to the printer.
         gcode (str): The G-code command to send. It will be stripped of whitespace.
-        callback (function, optional): A function to handle logging or other actions 
-                                        after sending the command. It receives a string 
+        callback (function, optional): A function to handle logging or other actions
+                                        after sending the command. It receives a string
                                         argument with the sent G-code message.
 
     Example:

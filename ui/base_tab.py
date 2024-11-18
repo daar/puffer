@@ -6,6 +6,7 @@ tabs to a Tkinter `ttk.Notebook` widget. Each tab is represented by a
 `ttk.Frame` widget that is automatically added to the notebook with a specified name.
 """
 
+from tkinter import ttk
 from utils.gcode_utils import send_gcode, parse_gcode_response
 
 
@@ -16,6 +17,7 @@ class BaseTab:
     Provides methods to log messages, check the printer connection, set status messages,
     and manage periodic tasks.
     """
+
     def __init__(self, tabs, app, tab_name):
         """
         Initialize a BaseTab instance.
