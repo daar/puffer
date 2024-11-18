@@ -91,7 +91,8 @@ class ExtrusionCalibrationTab(BaseTab):
             initial_length = float(self.initial_length.get())
             remaining_filament = float(self.remaining_filament.get())
 
-            # Calculate how much to extrude based on the difference between the initial and remaining filament
+            # Calculate how much to extrude based on the difference between the
+            # initial and remaining filament
             length_to_extrude = initial_length - remaining_filament
 
             if length_to_extrude < 10:  # Ensuring a minimum of 10mm to extrude
