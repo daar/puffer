@@ -1,3 +1,11 @@
+"""
+Module for managing the connection tab in a Tkinter application.
+
+This module defines the `ConnectionTab` class, which extends the `BaseTab` class
+to provide a user interface for connecting to a 3D printer. It includes functionality
+for managing connection settings, auto-homing, and displaying printer data.
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 import time
@@ -6,12 +14,44 @@ from ui.base_tab import BaseTab
 
 
 class ConnectionTab(BaseTab):
+    """
+    A class representing the connection tab in a Tkinter notebook.
+
+    This tab allows users to connect to a 3D printer, send auto-homing commands,
+    and view printer data such as firmware information and settings.
+
+    Attributes:
+        auto_home (tk.BooleanVar): A variable for managing the state of the
+                                   auto-home checkbox.
+        connection_status (ttk.Label): A label displaying the current connection status.
+        connect_button (ttk.Button): A button to initiate connection to the printer.
+        auto_home_checkbox (ttk.Checkbutton): A checkbox for enabling/disabling
+                                              auto-home on connection.
+        refresh_button (ttk.Button): A button to refresh the printer data.
+        treeview (ttk.Treeview): A treeview widget to display printer data.
+    """
+
     def __init__(self, tabs, app, tab_name):
+        """
+        Initialize the ConnectionTab instance.
+
+        Args:
+            tabs (ttk.Notebook): The notebook widget to which this tab is added.
+            app (Any): The main application instance providing the printer
+                       connection and related utilities.
+            tab_name (str): The name to display on this tab.
+        """
         super().__init__(tabs, app, tab_name)
         self.auto_home = tk.BooleanVar(value=False)  # Checkbox state
         self.setup_ui()
 
     def setup_ui(self):
+        """
+        Set up the user interface for the connection tab.
+
+        This method creates and arranges widgets, including labels, buttons,
+        checkboxes, and a treeview for displaying printer data.
+        """
         # Connection controls
         frame = ttk.Frame(self.frame, padding=10)
         frame.pack(fill="x")
@@ -51,57 +91,66 @@ class ConnectionTab(BaseTab):
         self.treeview.pack(fill="both", expand=1, padx=10, pady=10)
 
     def connect_to_printer(self):
-        """Attempt to connect to the printer."""
-        try:
-            ports = self.app.list_serial_ports()
-            if not ports:
-                messagebox.showerror(
-                    "Error", "No serial ports found. Please connect your printer."
-                )
-                return
+        """
+        Attempt to connect to the printer.
 
-            for port in ports:
-                try:
-                    print(f"Attempting to connect to {port}...")
-                    self.app.serial_connection = serial.Serial(port, 115200, timeout=2)
-                    self.connection_status.config(text="Connected")
-                    self.app.append_message(f"Printer connected on {port}.")
+        This method scans for available serial ports and tries to establish
+        a connection. If successful, it updates the connection status and
+        optionally performs auto-homing.
+        """
+        ports = self.app.list_serial_ports()
+        if not ports:
+            messagebox.showerror(
+                "Error", "No serial ports found. Please connect your printer."
+            )
+            return
 
-                    # Perform auto-homing if the checkbox is selected
-                    if self.auto_home.get():
-                        self.perform_auto_homing()
+        for port in ports:
+            try:
+                print(f"Attempting to connect to {port}...")
+                self.app.serial_connection = serial.Serial(port, 115200, timeout=2)
+                self.connection_status.config(text="Connected")
+                self.app.append_message(f"Printer connected on {port}.")
 
-                    # Enable the refresh button after connection
-                    self.refresh_button.config(state=tk.NORMAL)
+                # Perform auto-homing if the checkbox is selected
+                if self.auto_home.get():
+                    self.perform_auto_homing()
 
-                    # Refresh treeview data
-                    self.refresh_treeview()
-                    break  # Exit the loop once a connection is successful
-                except serial.SerialException:
-                    continue  # Try the next port if the current one fails
+                # Enable the refresh button after connection
+                self.refresh_button.config(state=tk.NORMAL)
 
-            else:
-                # If no connection was successful, show an error
-                messagebox.showerror("Error", "Failed to connect to any printer port.")
+                # Refresh treeview data
+                self.refresh_treeview()
+                break  # Exit the loop once a connection is successful
+            except serial.SerialException:
+                continue  # Try the next port if the current one fails
 
-        except Exception as e:
-            messagebox.showerror("Error", f"Unexpected error: {e}")
-            print(f"Unexpected error: {e}")
+        else:
+            # If no connection was successful, show an error
+            messagebox.showerror("Error", "Failed to connect to any printer port.")
 
     def perform_auto_homing(self):
-        """Send G-code for auto-homing."""
-        try:
-            self.app.append_message("Sending auto-home command (G28)...")
-            if self.app.serial_connection:
-                self.app.serial_connection.write(
-                    "G28\n".encode()
-                )  # Send G-code to auto-home the printer
-                self.app.append_message("Auto-home command sent.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to perform auto-homing: {e}")
+        """
+        Send the G-code command to auto-home the printer.
+
+        This method sends the G28 command to the printer if a serial connection
+        is active.
+        """
+        self.app.append_message("Sending auto-home command (G28)...")
+        if self.app.serial_connection:
+            self.app.serial_connection.write(
+                "G28\n".encode()
+            )  # Send G-code to auto-home the printer
+            self.app.append_message("Auto-home command sent.")
 
     def refresh_treeview(self):
-        """Populate the treeview with real printer data."""
+        """
+        Populate the treeview widget with data from the printer.
+
+        This method sends various G-code commands to the printer and displays
+        the parsed responses in the treeview. Each G-code command creates a
+        parent node, and its data is added as child nodes.
+        """
         if not self.app.serial_connection:
             messagebox.showerror("Error", "Not connected to a printer.")
             return
