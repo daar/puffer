@@ -6,8 +6,6 @@ tabs to a Tkinter `ttk.Notebook` widget. Each tab is represented by a
 `ttk.Frame` widget that is automatically added to the notebook with a specified name.
 """
 
-import time
-from tkinter import messagebox
 from utils.gcode_utils import send_gcode, parse_gcode_response
 
 
