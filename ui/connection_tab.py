@@ -77,7 +77,7 @@ class ConnectionTab(BaseTab):
                     # Refresh treeview data
                     self.refresh_treeview()
                     break  # Exit the loop once a connection is successful
-                except serial.SerialException as e:
+                except serial.SerialException:
                     continue  # Try the next port if the current one fails
 
             else:
