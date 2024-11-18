@@ -2,7 +2,7 @@
 Module for creating and managing tabs in a Tkinter notebook widget.
 
 This module provides the `BaseTab` class, which acts as a base for adding
-tabs to a Tkinter `ttk.Notebook` widget. Each tab is represented by a 
+tabs to a Tkinter `ttk.Notebook` widget. Each tab is represented by a
 `ttk.Frame` widget that is automatically added to the notebook with a specified name.
 """
 
