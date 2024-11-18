@@ -1,6 +1,7 @@
 from ui.connection_tab import ConnectionTab
 from ui.extrusion_calibration_tab import ExtrusionCalibrationTab
 
+
 class TabManager:
     def __init__(self, tabs, app):
         self.tabs = tabs
@@ -13,6 +14,7 @@ class TabManager:
     def create_tabs(self):
         for tab_class, name in self.tab_classes:
             tab_class(self.tabs, self.app, name)
+
 
 def setup_tabs(tabs, app):
     manager = TabManager(tabs, app)

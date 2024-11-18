@@ -14,26 +14,38 @@ class ExtrusionCalibrationTab(BaseTab):
         frame.pack(fill="x")
 
         # Inputs
-        ttk.Label(frame, text="Initial Filament Length (mm):").grid(row=0, column=0, sticky="w", padx=5)
+        ttk.Label(frame, text="Initial Filament Length (mm):").grid(
+            row=0, column=0, sticky="w", padx=5
+        )
         self.initial_length = ttk.Entry(frame, width=10)
         self.initial_length.grid(row=0, column=1, padx=5)
 
-        ttk.Label(frame, text="Remaining Filament Length (mm):").grid(row=1, column=0, sticky="w", padx=5)
+        ttk.Label(frame, text="Remaining Filament Length (mm):").grid(
+            row=1, column=0, sticky="w", padx=5
+        )
         self.remaining_filament = ttk.Entry(frame, width=10)
         self.remaining_filament.grid(row=1, column=1, padx=5)
 
-        self.extrude_button = ttk.Button(frame, text="Extrude", command=self.extrude_length)
+        self.extrude_button = ttk.Button(
+            frame, text="Extrude", command=self.extrude_length
+        )
         self.extrude_button.grid(row=2, column=0, columnspan=2, pady=5)
 
-        self.adjust_button = ttk.Button(frame, text="Adjust Extrusion", command=self.adjust_extrusion_factor)
+        self.adjust_button = ttk.Button(
+            frame, text="Adjust Extrusion", command=self.adjust_extrusion_factor
+        )
         self.adjust_button.grid(row=3, column=0, columnspan=2, pady=5)
 
         # Output area
-        self.output_area = ttk.Label(self.frame, text="Results will appear here", anchor="w")
+        self.output_area = ttk.Label(
+            self.frame, text="Results will appear here", anchor="w"
+        )
         self.output_area.pack(fill="x", padx=10, pady=5)
 
         # Live temperature display
-        self.temperature_label = ttk.Label(self.frame, text="Hotend Temp: Waiting for data...")
+        self.temperature_label = ttk.Label(
+            self.frame, text="Hotend Temp: Waiting for data..."
+        )
         self.temperature_label.pack(pady=10, padx=10)
 
         # Start the temperature update loop
@@ -46,17 +58,21 @@ class ExtrusionCalibrationTab(BaseTab):
             if current_temp is not None:
                 self.temperature_label.config(text=f"Hotend Temp: {current_temp}°C")
             else:
-                self.temperature_label.config(text="Hotend Temp: Error reading temperature.")
+                self.temperature_label.config(
+                    text="Hotend Temp: Error reading temperature."
+                )
         except Exception as e:
             self.temperature_label.config(text=f"Error: {str(e)}")
-        
+
         # Call this function again after 1000ms (1 second)
         self.frame.after(1000, self.update_temperature)
 
     def check_hotend_temperature(self):
         """Check the current hotend temperature by sending M105."""
         try:
-            send_gcode(self.app.serial_connection, "M105", self.app.append_message)  # Get hotend temperature
+            send_gcode(
+                self.app.serial_connection, "M105", self.app.append_message
+            )  # Get hotend temperature
             response = parse_gcode_response(self.app.serial_connection)
             for line in response:
                 if "T:" in line:  # Extract the temperature
@@ -90,15 +106,25 @@ class ExtrusionCalibrationTab(BaseTab):
                 self.heat_hotend()
 
             # Send M302 to allow extrusion regardless of temperature
-            send_gcode(self.app.serial_connection, "M302", self.app.append_message)  # Enable extrusion regardless of temperature
+            send_gcode(
+                self.app.serial_connection, "M302", self.app.append_message
+            )  # Enable extrusion regardless of temperature
 
             # Move the extruder to start the extrusion
             # Move the extruder by a small amount to ensure it’s primed
-            send_gcode(self.app.serial_connection, "G1 E5 F300", self.app.append_message)  # Move extruder by 5mm to prime it
+            send_gcode(
+                self.app.serial_connection, "G1 E5 F300", self.app.append_message
+            )  # Move extruder by 5mm to prime it
 
             # Now extrude the required amount
-            send_gcode(self.app.serial_connection, f"G1 E{length_to_extrude} F300", self.app.append_message)
-            self.output_area.config(text=f"Extruded {length_to_extrude}mm. Measure remaining filament length.")
+            send_gcode(
+                self.app.serial_connection,
+                f"G1 E{length_to_extrude} F300",
+                self.app.append_message,
+            )
+            self.output_area.config(
+                text=f"Extruded {length_to_extrude}mm. Measure remaining filament length."
+            )
 
         except ValueError as e:
             messagebox.showerror("Error", str(e))
@@ -109,7 +135,9 @@ class ExtrusionCalibrationTab(BaseTab):
         """Heat the hotend to 210°C if it is below that temperature."""
         try:
             self.output_area.config(text="Heating hotend to 210°C...")
-            send_gcode(self.app.serial_connection, "M104 S210", self.app.append_message)  # Set hotend to 210°C
+            send_gcode(
+                self.app.serial_connection, "M104 S210", self.app.append_message
+            )  # Set hotend to 210°C
             while True:
                 time.sleep(1)  # Wait for a second
                 current_temp = self.check_hotend_temperature()
@@ -133,7 +161,11 @@ class ExtrusionCalibrationTab(BaseTab):
             current_steps = self.get_current_extruder_steps()
             new_steps = current_steps * adjustment_factor
 
-            send_gcode(self.app.serial_connection, f"M92 E{new_steps:.2f}", self.app.append_message)
+            send_gcode(
+                self.app.serial_connection,
+                f"M92 E{new_steps:.2f}",
+                self.app.append_message,
+            )
             send_gcode(self.app.serial_connection, "M500", self.app.append_message)
 
             self.output_area.config(

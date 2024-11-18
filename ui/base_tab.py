@@ -1,5 +1,6 @@
 from tkinter import ttk
 
+
 class BaseTab:
     def __init__(self, tabs, app, tab_name):
         self.tabs = tabs

@@ -4,6 +4,7 @@ def send_gcode(serial_connection, gcode, callback=None):
         if callback:
             callback(f"Sent: {gcode}")
 
+
 def parse_gcode_response(serial_connection):
     response = []
     if serial_connection:

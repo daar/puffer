@@ -4,6 +4,7 @@ import time
 import serial
 from ui.base_tab import BaseTab
 
+
 class ConnectionTab(BaseTab):
     def __init__(self, tabs, app, tab_name):
         super().__init__(tabs, app, tab_name)
@@ -21,15 +22,21 @@ class ConnectionTab(BaseTab):
         self.connection_status.grid(row=0, column=1, sticky="w")
 
         # Connect Button
-        self.connect_button = ttk.Button(frame, text="Connect", command=self.connect_to_printer)
+        self.connect_button = ttk.Button(
+            frame, text="Connect", command=self.connect_to_printer
+        )
         self.connect_button.grid(row=0, column=2, padx=5)
 
         # Auto-Home Checkbox
-        self.auto_home_checkbox = ttk.Checkbutton(frame, text="Auto-home on connect", variable=self.auto_home)
+        self.auto_home_checkbox = ttk.Checkbutton(
+            frame, text="Auto-home on connect", variable=self.auto_home
+        )
         self.auto_home_checkbox.grid(row=1, column=0, columnspan=2, sticky="w", pady=5)
 
         # Refresh Button
-        self.refresh_button = ttk.Button(frame, text="Refresh", command=self.refresh_treeview, state=tk.DISABLED)
+        self.refresh_button = ttk.Button(
+            frame, text="Refresh", command=self.refresh_treeview, state=tk.DISABLED
+        )
         self.refresh_button.grid(row=1, column=2, padx=5)
 
         # Treeview for printer data
@@ -48,7 +55,9 @@ class ConnectionTab(BaseTab):
         try:
             ports = self.app.list_serial_ports()
             if not ports:
-                messagebox.showerror("Error", "No serial ports found. Please connect your printer.")
+                messagebox.showerror(
+                    "Error", "No serial ports found. Please connect your printer."
+                )
                 return
 
             for port in ports:
@@ -57,7 +66,7 @@ class ConnectionTab(BaseTab):
                     self.app.serial_connection = serial.Serial(port, 115200, timeout=2)
                     self.connection_status.config(text="Connected")
                     self.app.append_message(f"Printer connected on {port}.")
-                    
+
                     # Perform auto-homing if the checkbox is selected
                     if self.auto_home.get():
                         self.perform_auto_homing()
@@ -74,7 +83,7 @@ class ConnectionTab(BaseTab):
             else:
                 # If no connection was successful, show an error
                 messagebox.showerror("Error", "Failed to connect to any printer port.")
-                
+
         except Exception as e:
             messagebox.showerror("Error", f"Unexpected error: {e}")
             print(f"Unexpected error: {e}")
@@ -84,7 +93,9 @@ class ConnectionTab(BaseTab):
         try:
             self.app.append_message("Sending auto-home command (G28)...")
             if self.app.serial_connection:
-                self.app.serial_connection.write("G28\n".encode())  # Send G-code to auto-home the printer
+                self.app.serial_connection.write(
+                    "G28\n".encode()
+                )  # Send G-code to auto-home the printer
                 self.app.append_message("Auto-home command sent.")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to perform auto-homing: {e}")
@@ -103,12 +114,14 @@ class ConnectionTab(BaseTab):
             "Firmware Info": "M115",  # Get firmware information
             "Current Settings": "M503",  # Get current printer settings
             "Position": "M114",  # Get current position
-            "Endstop Status": "M119"  # Endstop status
+            "Endstop Status": "M119",  # Endstop status
         }
 
         # Loop through each G-code command, send it, and parse the response
         for key, gcode in gcodes.items():
-            self.app.serial_connection.write(f"{gcode}\n".encode())  # Send the G-code command
+            self.app.serial_connection.write(
+                f"{gcode}\n".encode()
+            )  # Send the G-code command
             time.sleep(0.5)  # Wait for the printer to respond
             response = self.app.read_response()  # Read the response from the printer
 

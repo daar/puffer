@@ -4,12 +4,13 @@ import serial
 from ui.tab_manager import setup_tabs
 import serial.tools.list_ports
 
+
 class PrinterControlApp:
     def __init__(self, root):
         self.root = root
         self.serial_connection = None
         self.message_log = []
-        
+
         # Set up the tab interface
         self.tabs = ttk.Notebook(root)
         setup_tabs(self.tabs, self)
@@ -18,7 +19,9 @@ class PrinterControlApp:
         # Message log at the bottom
         self.message_frame = ttk.Frame(root)
         self.message_frame.pack(fill="x", side="bottom")
-        self.message_listbox = tk.Listbox(self.message_frame, height=5, selectmode=tk.SINGLE)
+        self.message_listbox = tk.Listbox(
+            self.message_frame, height=5, selectmode=tk.SINGLE
+        )
         self.message_listbox.pack(fill="both", expand=1)
 
     def append_message(self, message):
@@ -40,10 +43,12 @@ class PrinterControlApp:
         try:
             # Let's assume we're reading until we receive a complete response
             while True:
-                line = self.serial_connection.readline().decode('utf-8').strip()
+                line = self.serial_connection.readline().decode("utf-8").strip()
                 if line:
                     response.append(line)
-                if 'ok' in line.lower() or 'error' in line.lower():  # Assuming we use 'ok'/'error' to mark the end of response
+                if (
+                    "ok" in line.lower() or "error" in line.lower()
+                ):  # Assuming we use 'ok'/'error' to mark the end of response
                     break
         except serial.SerialException as e:
             print(f"Error reading from serial port: {e}")
@@ -55,6 +60,7 @@ def create_app():
     root.title("3D Printer Control")
     app = PrinterControlApp(root)
     return app
+
 
 if __name__ == "__main__":
     app = create_app()
